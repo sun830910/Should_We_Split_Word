@@ -15,8 +15,6 @@ from tensorflow.keras.layers import Embedding
 from tensorflow.keras.layers import LSTM, GRU
 from tensorflow.keras.models import load_model
 
-from utils import PreProcesser
-
 
 class LSTMModel(object):
     def __init__(self, word_dict_length, seq_length):
@@ -47,12 +45,13 @@ class LSTMModel(object):
 
         for _ in range(epochs):
             self.model.fit(train_x, train_y, batch_size=16)
-        self.model.save('../result/lstm/lstm_model.h5')
+        # self.model.save('../result/lstm/lstm_model.h5')
 
     def test(self, test_x, test_y):
         model_path = '../result/lstm/lstm_model.h5'
         if self.model is None and os.path.exists(model_path):
             self.model = load_model(model_path)
+            print('loaded model...')
         pred_y = self.model.predict(test_x)
         pred_label = [1 if y >= 0.5 else 0 for y in pred_y]
 
@@ -65,12 +64,3 @@ class LSTMModel(object):
         print('当前测试集准确率为: {} '.format(str(cnt/len(test_y))))
 
 
-if __name__ == '__main__':
-    test = PreProcesser()
-    test.padding_tokens()  # 将输入转换成tokens形式
-    train_x, train_y = test.get_trainingSet()
-    test_x, test_y = test.get_validSet()
-
-    lstm_clf = LSTMModel(len(test.token_dict), 50)
-    # lstm_clf.train(train_x, train_y, 1)
-    lstm_clf.test(test_x, test_y)

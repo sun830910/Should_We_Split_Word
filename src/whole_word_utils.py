@@ -18,11 +18,12 @@ class PreProcesser(object):
     def __init__(self):
         self.token_dict = None
         self.corpus_df = None
-        self.max_length = 50
+        self.max_length = 100
 
         self.get_all_words_dict()
+        self.padding_tokens()  # 将输入转换成tokens形式
 
-    def read_corpus(self):
+    def read_corpus(self, split=False):
         """
         读训练集数据
         :return:
@@ -38,18 +39,25 @@ class PreProcesser(object):
         print('正面评论数量: {} 条'.format(str(len(pos_df))))
 
         total_df = pd.concat([neg_df, pos_df], ignore_index=True)
-        total_df['words'] = total_df.apply(lambda total_df: self.split_sentence(total_df[0]), axis=1)  # 分词
+        if split == True:
+            total_df['words'] = total_df.apply(lambda total_df: self.split_sentence(total_df[0]), axis=1)  # 分词
+        else:
+            total_df['words'] = total_df[0]
+
         self.corpus_df = total_df
         return total_df
 
     def split_sentence(self, sentence):
         return list(jieba.cut(str(sentence)))
 
-    def read_sum(self):
+    def read_sum(self, split=False):
         sum_path = '../data/sum.xls'
         comments = pd.read_excel(sum_path)
         comments = comments[comments['rateContent'].notnull()]
-        comments['words'] = comments.apply(lambda row: self.split_sentence(row['rateContent']), axis=1)  # 分词
+        if split == True:
+            comments['words'] = comments.apply(lambda row: self.split_sentence(row['rateContent']), axis=1)  # 分词
+        else:
+            comments['words'] = comments['rateContent']
         return comments
 
 
@@ -58,8 +66,8 @@ class PreProcesser(object):
         构建单词token字典
         :return:
         """
-        corpus_data = self.read_corpus()
-        sum_data = self.read_sum()
+        corpus_data = self.read_corpus(split=True)
+        sum_data = self.read_sum(split=True)
         total_words = pd.concat([corpus_data['words'], sum_data['words']], ignore_index=True)
         word_cnt_dict = dict()
         for words in total_words:
