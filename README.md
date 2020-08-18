@@ -20,7 +20,7 @@ python3+
 
 训练一个epoch后，分词后丢入的准确率为0.842，直接one-hot丢入则为0.835。
 
-![image](https://github.com/sun830910/blob/master/Should_We_Split_Word/img/result.jpeg)
+![image](https://github.com/sun830910/Should_We_Split_Word/blob/master/img/result.jpeg)
 
 ## 后续
 
